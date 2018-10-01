@@ -2,6 +2,7 @@
 *~
 *.sqlite3
 .DS_Store
-/collected_static
+./media
+collected_static
 __pycache__
 settings.py
