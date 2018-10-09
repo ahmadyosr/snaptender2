@@ -19,7 +19,9 @@ class Publisher(models.Model):
 		return self.title
 
 class Newspaper(models.Model):
-	is_processed = models.BooleanField(default=False)
+
+	is_extracted = models.BooleanField(default=False)
+	is_splitted = models.BooleanField(default=False)
 	title = models.CharField(blank=True, max_length=200)
 	publish_date = models.DateField(null=True, blank=True, auto_now_add=False)
 	file = models.FileField('pdfs/', unique=True)

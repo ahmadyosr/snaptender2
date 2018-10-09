@@ -2,7 +2,7 @@
 *~
 *.sqlite3
 .DS_Store
-
+./modules
 collected_static
 __pycache__
 settings.py
