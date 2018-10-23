@@ -1,4 +1,4 @@
-from catalogue.models import TenderSnippet
+from catalogue.models import Snippet
 from rest_framework import serializers
 from django.conf import settings 
 
@@ -7,7 +7,7 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 	image_url = serializers.SerializerMethodField()
 
 	class Meta:
-		model = TenderSnippet
+		model = Snippet
 		fields = ('start_date',
 		'finish_date',
 		'tender_newspaper_id',

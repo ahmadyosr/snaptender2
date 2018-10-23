@@ -399,32 +399,32 @@
                                 </a>
                                 <a class="btn btn-default btn-lg btn-block" target="_blank" 
                                 href="{% url 'extract-snippets' %}?pdf_id=">
-                                    Complete Snippets Extraction ({{processed_pdfs_count}}/{{pdfs_count}})
+                                    Complete Snippets Extraction ({{extracted_pdfs_count}}/{{pdfs_count}})
                                 </a>
                                 <a class="btn btn-default btn-lg btn-block" target="_blank" 
-                                href="{% url 'extract-snippets' %}?pdf_id=">
-                                    Complete PDFs Splitting ({{processed_pdfs_count}}/{{pdfs_count}})
+                                href="{% url 'split-pdf' %}?pdf_id=">
+                                    Complete PDFs Splitting ({{splitted_pdfs_count}}/{{pdfs_count}})
                                 </a>
                             </div>
 
                             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                                 <thead>
                                     <tr>
-                                        <th>Rendering engine</th>
-                                        <th>Browser</th>
-                                        <th>Platform(s)</th>
-                                        <th>Engine version</th>
-                                        <th>CSS grade</th>
+                                        <th>id</th>
+                                        <th>Newspaper</th>
+                                        <th>Is splitted</th>
+                                        <th>Is extracted</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for pdf in pdfs %} 
                                     <tr class="gradeA">
-                                        <td>Other browsers</td>
-                                        <td>{{forloop.counter}}</td>
-                                        <td>-</td>
-                                        <td class="center">-</td>
-                                        <td class="center">U</td>
+                                        <td>{{pdf.id}}</td>
+                                        <td>{{pdf.file.name}}</td>
+                                        <td>{{pdf.is_splitted}}</td>
+                                        <td>{{pdf.is_extracted}}</td>
+                                        <td></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
