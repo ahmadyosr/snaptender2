@@ -67,9 +67,28 @@ def extract_paper(paper):
 Catalogue views 
 """
 
-def tenders(request):
+def snippets(request):
 	context = {} 
-	context['tenders'] = Snippet.objects.filter(is_tender=True)
+	filter_ = request.GET.get('filter')
+
+	if filter_ == 'tenders': 
+		snippets = Snippet.objects.filter(is_tender=True)
+
+	elif filter_ == 'not-tenders':
+		snippets = Snippet.objects.filter(is_tender=False)
+
+	elif filter_ == 'has-text': 
+		snippets = Snippet.objects.exclude(text='')
+
+	elif filter_ == 'no-text': 
+		snippets = Snippet.objects.filter(text='')
+
+	else : 
+		snippets = Snippet.objects.filter(is_tender=True)
+
+	
+	context['snippets']= snippets
+
 	return render(request, 'tenders.html', context)
 
 def toggle_acceptance(request, tender_id):

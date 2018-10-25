@@ -4,7 +4,7 @@ import numpy as np
 import requests
 import json
 
-from ocr.config import config
+from modules.ocr.config import config
 from io import BytesIO
 import os 
 
@@ -130,7 +130,7 @@ class TendersBoxesExtractor(BoxesExtractor):
 	def is_tender(self, tender):
 		print('enter is_tender()')
 
-		tender_text = OceanOCR.get_tender_text(tender)
+		tender_text = OceanOCR.get_image_text(tender)
 		keywords = config['TENDERS_KEYWORDS']
 
 		for keyword in keywords: 

@@ -1,5 +1,5 @@
 from io import BytesIO
-from config import config
+from modules.ocr.config import config
 import cv2
 import os 
 import requests 
@@ -8,12 +8,12 @@ import datetime
 import numpy as np
 import json
 
-
 class OceanOCR():
 
 	api_key = config['OCR_API_KEY']
 	tenders_keywords = config['TENDERS_KEYWORDS']
 	ocr_lang = config['OCR_LANG']
+
 	@staticmethod
 	def make_ocr_api_call(tender):
 		print('enter api call ')
@@ -36,7 +36,7 @@ class OceanOCR():
 		return r 
 
 	@staticmethod
-	def get_tender_text(tender):
+	def get_image_text(tender):
 		print('enter tender text')
 		r = OceanOCR.make_ocr_api_call(tender)
 
@@ -53,8 +53,8 @@ class OceanOCR():
 
 		except : 
 			print('----PARSED TEXT ERROR KEY')
-			cv2.imshow('error in this', tender)
-			cv2.waitKey(0)
+			# cv2.imshow('error in this', tender)
+			# cv2.waitKey(0)
 			print(r.text)
 			print('-----error printed')
 
