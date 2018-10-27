@@ -34,7 +34,7 @@ class NewspaperPage(models.Model):
 	page_no = models.IntegerField(default=0)
 	image = models.FileField(upload_to='newspapers_pages/')
 	has_tenders = models.BooleanField(default=False)
-	has_rectangles = models.BooleanField(default=False)
+	has_snippets = models.BooleanField(default=False)
 	is_extracted = models.BooleanField(default=False)
 
 class Snippet(models.Model):

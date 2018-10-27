@@ -31,40 +31,63 @@ def split_to_papers(paper):
 
 	return files
 
-def extract_paper(paper):
+
+def get_page_rectangles(p):
+	paper_name = p.newspaper.file.name.split('/')[-1]
+	
+	if not os.path.exists(settings.NEWSPAPERS_PAGES_DIR):
+		os.makedirs(settings.NEWSPAPERS_PAGES_DIR)
+
+	pages_dir = os.path.join(settings.NEWSPAPERS_PAGES_DIR , paper_name)
+	
+	if not os.path.exists(pages_dir):
+		os.makedirs(pages_dir)
+
+	snippets_dir = os.path.join(pages_dir, settings.ANY_NEWSPAPERS_SNIPPETS_DIR_NAME)
+	
+	if not os.path.exists(snippets_dir):
+		os.makedirs(snippets_dir)
+
+	extractor = BoxesExtractor(p.image.path)
+	extractor.extract()
+
+
+	rectangles = extractor.save_rectangles(snippets_dir)
+	snippets = []
+
+	for file_name, bw_rate in rectangles:
+		file_name_ = os.path.join(settings.NEWSPAPERS_PAGES_DIR_NAME,
+								paper_name,
+								settings.ANY_NEWSPAPERS_SNIPPETS_DIR_NAME,
+								file_name)
+
+		s = Snippet(newspaper=p.newspaper,
+				 page = p,
+				 extract_date=datetime.date.today(), 
+				 image=file_name_, 
+				 bw_rate=bw_rate)
+		
+		snippets += [s]
+
+	return snippets
+
+def extract_paper_(paper):
 	if paper.is_extracted:
 		return 
-		
+
 	pages = NewspaperPage.objects.filter(newspaper=paper)
-	
-
+	paper_snippets = [] 	
 	for p in pages : 
-		print('enter page')
-		extractor = BoxesExtractor(p.image.path)
-		extractor.extract()
+		snippets = get_page_rectangles(p)
+		
+		# if snippets : 
+		# 	p.has_snippets = True
+		# 	p.save() 
 
-		snippets = []
-		# rectangles = extractor.save_rectangles(settings.SNIPPETS_POOL_PATH)
+		# Snippet.objects.bulk_create(snippets)			
+		paper_snippets += snippets
 
-		for r, bw_rate in rectangles:
-			s = Snippet(newspaper=paper,
-					 page = p,
-					 extract_date=datetime.date.today(), 
-					 image=r, 
-					 bw_rate=bw_rate)
-			snippets += [s]
-
-		if rectangles : 
-			p.is_extracted = True
-			p.has_rectangles = True
-			p.save() 
-
-		Snippet.objects.bulk_create(snippets)			
-
-	paper.is_extracted = True
-	paper.save()
-	print('done paper id %d ', paper.id)
-
+	return paper_snippets 
 """
 Catalogue views 
 """
@@ -125,17 +148,11 @@ def newspaper(request, paper_id):
 	context['pages'] = NewspaperPage.objects.filter(newspaper=paper_id)
 	context['snippets'] = snippets.filter(is_tender=False)
 	context['tenders'] = snippets.filter(is_tender=True)
-	print(context['pages'])
 	return render(request, 'newspaper.html', context)
 
 def newspapers(request):
 	context = {} 
-	newspapers = Newspaper.objects.all().order_by('-id')
-	context['pdfs'] = newspapers
-	context['pdfs_count'] = newspapers.count()
-	context['extracted_pdfs_count'] = newspapers.filter(is_extracted=True).count()
-	context['splitted_pdfs_count'] = newspapers.filter(is_splitted=True).count()
-	# context['files_count'] = len(os.listdir(settings.NEWSPAPERS_POOL_PATH))
+	context['pdfs'] = Newspaper.objects.all().order_by('-id')
 	return render(request, 'newspapers.html', context)
 
 def split_paper(request, paper_id):
@@ -150,24 +167,21 @@ def split_paper(request, paper_id):
 		paper.is_splitted = True
 		paper.save() 
 
-		return HttpResponse(r)
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	return HttpResponse(status=403)	
 
 def extract_paper(request, paper_id):
-	if request.GET.get('page_id'):
-		paper = Newspaper.objects.get(id=request.GET.get('pdf_id'))
+	if request.method == 'POST':
+		paper = Newspaper.objects.get(id=paper_id)
 
 		if paper.is_extracted == True : 
 			return HttpResponse('Paper %d already done' % paper.id )
 
 		extract_paper(paper)
-		return HttpResponse('Done')
-	
-	newspapers = Newspaper.objects.filter(is_extracted=False)
+		paper.is_extracted = True
+		paper.save() 
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	for paper in newspapers :
-		extract_paper(paper)
 
-	return HttpResponse('done')
-
+	return HttpResponse(status=403)	

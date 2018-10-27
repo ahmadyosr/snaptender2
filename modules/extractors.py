@@ -92,11 +92,13 @@ class BoxesExtractor():
 			if bw_rate < 0.45:
 				continue
 
-			file_path = os.path.join(output_path,str(datetime.datetime.now().time())+'_'+str(i)+'.jpg') 
+			file_name = str(datetime.datetime.now().time())+'_'+str(i)+'.jpg'
+			file_path = os.path.join(output_path,file_name) 
+			
 			r = cv2.imwrite(file_path,cropped)
 			
 			if r : 
-				images += [(file_path, bw_rate)]
+				images += [(file_name, bw_rate)]
 	
 		return images
 
