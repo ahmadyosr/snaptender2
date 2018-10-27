@@ -37,32 +37,36 @@ for s in snippets :
 	if not s.text :
 
 		im = s.image.path
+		size = os.stat(im).st_size 
+	
 		im = cv2.imread(im)
 		c+= 1
+		print(im.shape)
 		print('Done so far : ' , c)
 
-		s.text = OceanOCR.get_image_text(im)
+		# s.text = OceanOCR.get_image_text(im)
 		# if is_tender(s.text):
 		# 	s.is_tender = True 
-		if s.text : 
-			s.save()
+		print(size)
 
-		# try : 
-		# 	s.text = OceanOCR.get_image_text(im)
+		if size > 1024000 : 
+			continue 
+					
+		try :
 
-		# 	if is_tender(s.text):
-		# 		s.is_tender = True 
+			s.text = OceanOCR.get_image_text(im)
+			if s.text : 
+				s.save()
 
-		# 	s.save()
 
-		# except Exception as e :
-		# 	print('error')
+		except Exception as e :
+			print('error')
 
-		# 	x = str(e) 
-		# 	with open('errors_log.txt', 'a') as f:
-		# 		f.write(x)
+			x = str(e) 
+			with open('errors_log.txt', 'a') as f:
+				f.write(x)
 
-		# 	print(x)
+			print(x)
 
 		cv2.destroyAllWindows()
 
