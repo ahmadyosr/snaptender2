@@ -1,14 +1,19 @@
 from django.urls import path
 from dashboard import views 
 
+app_name = 'dashboard'
 urlpatterns = [
-	path('snippets/', views.snippets, name='dashboard-snippets'),
-	path('toggle_acceptance/<int:tender_id>/', views.toggle_acceptance, name='dashboard-toggle-acceptance'),
+	path('', views.dashboard, name='dashboard'),
+	path('upload/', views.upload, name='upload'),
+	path('delete_newspaper/<int:paper_id>/', views.delete_newspaper, name='delete_newspaper'),
 
-	path('newspapers/', views.newspapers, name='dashboard-newspapers'),
-	path('newspaper/<int:paper_id>/', views.newspaper, name='dashboard-newspaper'),
-	path('import_pdfs_dir/', views.import_pdfs_dir, name='import-pdfs-dir'),
-	path('extract_snippets/', views.extract_snippets, name='extract-snippets'),
-	path('split_pdf/', views.split_pdf, name='split-pdf')
+	path('snippets/', views.snippets, name='snippets'),
+	path('toggle_acceptance/<int:tender_id>/', views.toggle_acceptance, name='toggle-acceptance'),
+
+	path('newspapers/', views.newspapers, name='newspapers'),
+	path('newspaper/<int:paper_id>/', views.newspaper, name='newspaper'),
+
+	path('extract_paper/<int:paper_id>/', views.extract_paper, name='extract_paper'),
+	path('split_paper/<int:paper_id>/', views.split_paper, name='split_paper')
 ]
 

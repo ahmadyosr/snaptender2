@@ -45,7 +45,7 @@
                                         <td>{{s.text}}</td>
                                         <td>{{s.bw_rate}}%</td>
                                         <td><a class='btn btn-primary'
-                                         href='{% url "dashboard-toggle-acceptance" tender_id=s.id %}' >Reject</a></td>
+                                         href='{% url "dashboard:toggle-acceptance" tender_id=s.id %}' >Reject</a></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

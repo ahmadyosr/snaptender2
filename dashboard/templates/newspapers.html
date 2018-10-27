@@ -19,41 +19,67 @@
                         <div class="panel-body">
                                                         <!-- /.table-responsive -->
                             <div class="well">
-                                <h4D>ataTables Usage Information</h4>
+                                <h4D>Upload PDFs</h4>
                                 <p>DataTables is a very flexible, advanced tables plugin for jQuery. In SB Admin, we are using a specialized version of DataTables built for Bootstrap 3. We have also customized the table headings to use Font Awesome icons in place of images. For complete documentation on DataTables, visit their website at <a target="_blank" href="https://datatables.net/">https://datatables.net/</a>.</p>
-                                <a class="btn btn-default btn-lg btn-block" target="_blank" href="{% url 'import-pdfs-dir' %}">
-                                    Sync Database/Pdf-Directory ({{files_count}} in dir.)
-                                </a>
-                                <a class="btn btn-default btn-lg btn-block" target="_blank" 
-                                href="{% url 'extract-snippets' %}?pdf_id=">
-                                    Complete Snippets Extraction ({{extracted_pdfs_count}}/{{pdfs_count}})
-                                </a>
-                                <a class="btn btn-default btn-lg btn-block" target="_blank" 
-                                href="{% url 'split-pdf' %}?pdf_id=">
-                                    Complete PDFs Splitting ({{splitted_pdfs_count}}/{{pdfs_count}})
-                                </a>
+                                <form method="POST" action="{% url 'dashboard:upload' %}" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <input type="file" name="file" multiple>
+                                        <input type="submit" class='btn btn-default btn-lg btn-block' value='Submit'>
+                                </form>   
                             </div>
 
                             <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
                                 <thead>
                                     <tr>
-                                        <th>id</th>
+                                        <th >id</th>
+                                        <th>Title</th>
                                         <th>Newspaper</th>
                                         <th>Is splitted</th>
                                         <th>Is extracted</th>
-                                    <th>Title</th>
-                                    <th>Date</th>
+                                        <th>Date</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for pdf in pdfs %} 
                                     <tr class="gradeA">
-                                        <td><a href='{% url "dashboard-newspaper" paper_id=pdf.id %}'>{{pdf.id}}</a></td>
-                                        <td>{{pdf.file.name}}</td>
-                                        <td>{{pdf.is_splitted}}</td>
-                                        <td>{{pdf.is_extracted}}</td>
+                                        <td><a href='{% url "dashboard:newspaper" paper_id=pdf.id %}'>{{pdf.id}}</a></td>
                                         <td>{{pdf.title}}</td>
+                                        <td>{{pdf.file.name}}</td>
+                                        <td>
+                                            {% if pdf.is_splitted %} 
+                                            done
+                                            {% else %} 
+                                            <form action='{% url "dashboard:split_paper" paper_id=pdf.id %}' 
+                                            method='POST'>
+                                                {% csrf_token %}
+                                                <input type='submit'  class='btn btn-success' value='split'>
+                                            </form>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+
+                                            {% if pdf.is_extracted %} 
+                                            done
+                                            {% elif pdf.is_splitted %} 
+                                            <form action='{% url "dashboard:extract_paper" paper_id=pdf.id %}' 
+                                            method='POST'>
+                                                {% csrf_token %} 
+                                                <input type='submit'  class='btn btn-success' value='extract'>
+                                            </form>
+                                            {% else %} 
+                                            No
+                                            {% endif %}
+
+                                        </td>
                                         <td>{{pdf.publish_date}}</td>
+                                        <td>
+                                            <form action='{% url "dashboard:delete_newspaper" paper_id=pdf.id %}' 
+                                            method='POST'>
+                                                {% csrf_token %}
+                                                <input type='submit'  class='btn btn-warning' value='delete'>
+                                             </form>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

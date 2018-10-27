@@ -8,13 +8,15 @@ import time
 from modules.extractors import BoxesExtractor
 from modules.splitter import split
 from pdf2image import convert_from_path
+from catalogue.forms import NewspaperForm
+
 """ utility
 """
 
 def split_to_papers(paper):
 
 	output_path = os.path.join(settings.MEDIA_ROOT, 'pages/'+paper.file.name)
-	paper_path = os.path.join(settings.NEWSPAPERS_POOL_PATH, paper.file.name)
+	# paper_path = os.path.join(settings.NEWSPAPERS_POOL_PATH, paper.file.name)
 	
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
@@ -42,7 +44,7 @@ def extract_paper(paper):
 		extractor.extract()
 
 		snippets = []
-		rectangles = extractor.save_rectangles(settings.SNIPPETS_POOL_PATH)
+		# rectangles = extractor.save_rectangles(settings.SNIPPETS_POOL_PATH)
 
 		for r, bw_rate in rectangles:
 			s = Snippet(newspaper=paper,
@@ -66,6 +68,26 @@ def extract_paper(paper):
 """
 Catalogue views 
 """
+
+def dashboard(request):
+	context = {}
+	return render(request, 'dashboard.html', context)
+
+def upload(request):
+	papers = [] 
+
+	for f in request.FILES.getlist('file'):
+		p = Newspaper(file=f)
+		p.save()
+		papers += [p]
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def delete_newspaper(request, paper_id):
+	if request.method == 'POST': 
+		Newspaper.objects.get(id=paper_id).delete()
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def snippets(request):
 	context = {} 
@@ -112,35 +134,25 @@ def newspapers(request):
 	context['pdfs_count'] = newspapers.count()
 	context['extracted_pdfs_count'] = newspapers.filter(is_extracted=True).count()
 	context['splitted_pdfs_count'] = newspapers.filter(is_splitted=True).count()
-	context['files_count'] = len(os.listdir(settings.NEWSPAPERS_POOL_PATH))
+	# context['files_count'] = len(os.listdir(settings.NEWSPAPERS_POOL_PATH))
 	return render(request, 'newspapers.html', context)
 
-def split_pdf(request):
-	if request.GET.get('pdf_id'):
-		paper = Newspaper.objects.get(id=request.GET.get('pdf_id'))
+def split_paper(request, paper_id):
+	if request.method == 'POST':
+		paper = Newspaper.objects.get(id=paper_id)
 
 		if paper.is_splitted == True : 
 			return HttpResponse('Paper %d already done' % paper.id )
 
-		paper.is_splitted = True
-		paper.save() 
 		r = split_to_papers(paper)
-		return HttpResponse(r)
- 	
-	newspapers = Newspaper.objects.filter(is_splitted=False)
-	done = []
-
-	for paper in newspapers : 
-		s = time.time()
-		split_to_papers(paper)
 		paper.is_splitted = True
 		paper.save() 
-		done += [paper]
-		print('time elapsed : ', time.time()-s)
-	
-	return HttpResponse(done)
 
-def extract_snippets(request):
+		return HttpResponse(r)
+
+	return HttpResponse(status=403)	
+
+def extract_paper(request, paper_id):
 	if request.GET.get('page_id'):
 		paper = Newspaper.objects.get(id=request.GET.get('pdf_id'))
 
@@ -157,17 +169,3 @@ def extract_snippets(request):
 
 	return HttpResponse('done')
 
-def import_pdfs_dir(request):
-	newspapers = Newspaper.objects.all()
-
-	folder = settings.NEWSPAPERS_POOL_PATH
-	files = os.listdir(folder)
-
-	to_populate = [] 
-	for i, f in enumerate(files) : 
-		if not newspapers.filter(file = f).exists():
-			print(f)
-			to_populate += [Newspaper(file=f)] 
-
-	r= Newspaper.objects.bulk_create(to_populate)
-	return HttpResponse('created %d newspaper' % len(r))

@@ -281,10 +281,13 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a href="{% url 'dashboard-newspapers' %}"><i class="fa fa-dashboard fa-fw"></i> PDFs</a>
+                            <a href="{% url 'dashboard:dashboard' %}"><i class="fa fa-dashboard fa-fw"></i>home</a>
                         </li>
                         <li>
-                            <a href="{% url 'dashboard-tenders' %}"><i class="fa fa-dashboard fa-fw"></i> Tenders</a>
+                            <a href="{% url 'dashboard:newspapers' %}"><i class="fa fa-dashboard fa-fw"></i> PDFs</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'dashboard:snippets' %}"><i class="fa fa-dashboard fa-fw"></i> Tenders</a>
                         </li>
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
@@ -393,7 +396,7 @@
     <script src="{% static 'dashboard-template/vendor/metisMenu/metisMenu.min.js' %}"></script>
 
     <!-- DataTables JavaScript -->
-    <script src="{% static 'dashboard-template/vendor/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <!-- <script src="{% static 'dashboard-template/vendor/datatables/js/jquery.dataTables.min.js' %}"></script> -->
     <script src="{% static 'dashboard-template/vendor/datatables-plugins/dataTables.bootstrap.min.js' %}"></script>
     <script src="{% static 'dashboard-template/vendor/datatables-responsive/dataTables.responsive.js' %}"></script>
 
