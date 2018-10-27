@@ -12,24 +12,24 @@ from catalogue.forms import NewspaperForm
 
 """ utility
 """
-
 def split_to_papers(paper):
-
-	output_path = os.path.join(settings.MEDIA_ROOT, 'pages/'+paper.file.name)
-	# paper_path = os.path.join(settings.NEWSPAPERS_POOL_PATH, paper.file.name)
+	paper_name = paper.file.name.split('/')[-1]
+	output_path = os.path.join(settings.NEWSPAPERS_PAGES_DIR, paper_name)
 	
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 
-	result = convert_from_path(paper_path, output_folder=output_path, thread_count=4, fmt='jpg')
+	result = convert_from_path(paper.file.path, output_folder=output_path, thread_count=4, fmt='jpg')
 	
 	files = []
-	for i,f in enumerate(result): 
-		files += [NewspaperPage(page_no=i, newspaper=paper, image=f.filename)]
+	for i,f in enumerate(result):
+		img_name = f.filename.split('/')[-1]
+		file_name_ = os.path.join(settings.NEWSPAPERS_PAGES_DIR_NAME, paper_name, img_name)
+		files += [NewspaperPage(page_no=i, newspaper=paper, image=file_name_)]
 		
 	NewspaperPage.objects.bulk_create(files)
 
-	return result
+	return files
 
 def extract_paper(paper):
 	if paper.is_extracted:
@@ -125,6 +125,7 @@ def newspaper(request, paper_id):
 	context['pages'] = NewspaperPage.objects.filter(newspaper=paper_id)
 	context['snippets'] = snippets.filter(is_tender=False)
 	context['tenders'] = snippets.filter(is_tender=True)
+	print(context['pages'])
 	return render(request, 'newspaper.html', context)
 
 def newspapers(request):
@@ -138,6 +139,7 @@ def newspapers(request):
 	return render(request, 'newspapers.html', context)
 
 def split_paper(request, paper_id):
+
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
 

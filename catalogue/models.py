@@ -23,16 +23,16 @@ class Newspaper(models.Model):
 	is_splitted = models.BooleanField(default=False)
 	title = models.CharField(blank=True, max_length=50,choices=NEWSPAPER_CHOICES)
 	publish_date = models.DateField(null=True, blank=True, auto_now_add=False)
-	file = models.FileField(upload_to='pdfs/', unique=True)
-
+	file = models.FileField(blank=False, null=False, upload_to='newspapers_pdfs/', unique=True)
+	
 	def __str__(self):
 		return self.file.name
 
 
 class NewspaperPage(models.Model):
-	newspaper = models.ForeignKey(Newspaper, null=True, on_delete=models.SET_NULL)
+	newspaper = models.ForeignKey(Newspaper, null=True, on_delete=models.CASCADE)
 	page_no = models.IntegerField(default=0)
-	image = models.FileField('pages/')
+	image = models.FileField(upload_to='newspapers_pages/')
 	has_tenders = models.BooleanField(default=False)
 	has_rectangles = models.BooleanField(default=False)
 	is_extracted = models.BooleanField(default=False)
@@ -57,6 +57,7 @@ class Snippet(models.Model):
 
 	image = models.FileField(upload_to='tenders_images/')
 	text = models.CharField(blank=True, max_length=200)
+	suggested_category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL, related_name='suggested_category')
 	category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL)
 	bw_rate = models.IntegerField(default=0)
 	

@@ -1,24 +1,33 @@
-from catalogue.models import  NewspaperPage, Snippet
+from catalogue.models import  Newspaper, NewspaperPage, Snippet
 import os
-
+from django.conf import settings
+from dashboard.views import split_to_papers
 def run():
+	# file_name = 'f1'
+
+	# n = NewspaperPage.objects.create(image='f1')
+	# n.image.name = 'pages/'+file_name
+	# n.save()
+
+	paper = Newspaper.objects.last()
+	# r = split_to_papers(paper)
+
+	# for p in r: 
+	# 	print(p.image.name)
+	# 	print(p.image.url)
+	# 	print(p.image.path)
+	# # 	break
+	# paper.is_splitted= False
+	# paper.save() 
+
+	print(paper.file.name)
+	print(paper.file.path)
+	print(paper.file.url)
+	print('--')
+	papers = paper.newspaperpage_set.all()
+	print(papers[0].image.name)
+	print(papers[0].image.path)
+	print(papers[0].image.url)
+	print('--')
+
 	
-	x = Snippet.objects.all()
-	# print('count of files',x.count())
-	# c = 0 
-
-	# for f in x:
-	# 	if not os.path.isfile(f.image.path):
-	# 		# print('not a file')
-	# 		# print (f.id)
-	# 		# print(f.delete())
-	# 		pass
-	# 	else: 
-	# 		c+= 1
-	# 		# print (c)	
-	# print(c)
-
-	count = x.filter(bw_rate__gte=84).count()
-	count2 = x.filter(bw_rate__lte=84).count()
-	print('bw_rate > 84', count)
-	print('other', count2)
