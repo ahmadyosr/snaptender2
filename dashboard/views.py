@@ -9,12 +9,22 @@ from modules.extractors import BoxesExtractor
 from modules.splitter import split
 from pdf2image import convert_from_path
 from catalogue.forms import NewspaperForm
-from modules.ocr.ocr import  OceanOCR
+from modules.ocr.ocr import  OceanOCR, config
 import cv2
+from django.db.models import Q
 
 
 """ utility
 """
+def find_keyword(snippet, keywords_label):
+	keywords = config[keywords_label]
+
+	for keyword in keywords: 
+		if snippet.text.find(keyword) > -1:
+			return True
+
+	return False
+
 def split_to_papers(paper):
 	paper_name = paper.file.name.split('/')[-1]
 
@@ -46,11 +56,7 @@ def split_to_papers(paper):
 		files += [NewspaperPage(page_no=i, newspaper=paper, image=file_name_)]
 		
 	NewspaperPage.objects.bulk_create(files)
-	for f in files : 
-		print('file--')
-		print(f.image.name)
-		print(f.image.path)
-		print(f.image.url)
+
 	return files
 
 
@@ -164,13 +170,22 @@ def toggle_acceptance(request, tender_id):
 	Snippet.objects.filter(id=tender_id).update(is_tender= not t.is_tender)
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+def approve_category(request, tender_id):
+	t = Snippet.objects.get(id=tender_id)
+	t.category = t.suggested_category 
+
+	t.save()
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 def newspaper(request, paper_id):
 	context = {}
 	snippets = Snippet.objects.all().filter(newspaper=paper_id)
 	context['paper'] = Newspaper.objects.get(id=paper_id)
 	context['pages'] = NewspaperPage.objects.filter(newspaper=paper_id)
 	context['snippets'] = snippets.filter(is_tender=False)
-	context['tenders'] = snippets.filter(is_tender=True)
+	context['tenders'] = snippets.filter(Q(is_tender=True) | Q(is_auction=True))
+
 	return render(request, 'newspaper.html', context)
 
 def newspapers(request):
@@ -213,7 +228,6 @@ def ocr_paper(request, paper_id):
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
 		snippets = paper.snippet_set.all()
-		print(snippets)
 
 		for s in snippets : 
 			im_path = s.image.path
@@ -234,6 +248,21 @@ def ocr_paper(request, paper_id):
 
 		paper.is_ocr = True
 		paper.save()			
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	return HttpResponse(status=403)
+
+
+def find_tenders(request, paper_id):
+	if request.method == 'POST':
+		paper = Newspaper.objects.get(id=paper_id)
+		snippets = paper.snippet_set.all()
+
+		for s in snippets :
+			s.is_tender = find_keyword(s, 'TENDERS_KEYWORDS')
+			s.is_auction = find_keyword(s,'AUTCTION_KEYWORDS')
+			s.save()
+
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	return HttpResponse(status=403)

@@ -22,6 +22,7 @@ class Newspaper(models.Model):
 	is_extracted = models.BooleanField(default=False)
 	is_splitted = models.BooleanField(default=False)
 	is_ocr = models.BooleanField(default=False)
+	is_find_tenders = models.BooleanField(default=False)
 	
 
 	title = models.CharField(blank=True, max_length=50,choices=NEWSPAPER_CHOICES)
@@ -55,6 +56,7 @@ class Snippet(models.Model):
 
 
 	is_tender = models.BooleanField(default=False)
+	is_auction = models.BooleanField(default=False)
 	is_republished = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=False)
 

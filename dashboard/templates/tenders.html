@@ -32,7 +32,9 @@
                                     <tr>
                                         <th>#</th>
                                         <th>id</th>
-                                        <th>URL</th>
+                                        <th>text</th>
+                                        <th>cat.</th>
+                                        <th>suggested cat.</th>
                                         <th>BW rate</th>
                                         <th></th>
                                     </tr>
@@ -43,6 +45,8 @@
                                         <td>{{forloop.counter}}</td>
                                         <td><a href='{{s.image.url}}'>{{s.id}}</a></td>
                                         <td>{{s.text}}</td>
+                                        <td>{{s.category}} </td>
+                                        <td> {{s.suggested_category}} <a href="{% url 'dashboard:approve_category' tender_id=s.id%}"> app.&#10003;</a></td>
                                         <td>{{s.bw_rate}}%</td>
                                         <td><a class='btn btn-primary'
                                          href='{% url "dashboard:toggle-acceptance" tender_id=s.id %}' >Reject</a></td>

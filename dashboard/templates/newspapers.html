@@ -37,6 +37,7 @@
                                         <th>Is splitted</th>
                                         <th>Is extracted</th>
                                         <th>Is OCR-ed</th>
+                                        <th>filter tenders</th>
                                         <th>Date</th>
                                         <th></th>
                                     </tr>
@@ -85,6 +86,17 @@
                                             {% else %}
                                             No
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if pdf.is_find_tenders %} 
+                                            done
+                                            {% else %} 
+                                            <form action='{% url "dashboard:find_tenders" paper_id=pdf.id %}' 
+                                            method='POST'>
+                                                {% csrf_token %}
+                                                <input type='submit'  class='btn btn-success' value='find tenders'>
+                                            </form>
+                                            {% endif %} 
                                         </td>
                                         <td>{{pdf.publish_date}}</td>
                                         <td>
