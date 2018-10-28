@@ -45,7 +45,7 @@
                                         <td><a href='{{tender.image.url}}'>{{tender.image.path}}</a></td>
                                         <td>{{tender.bw_rate}}%</td>
                                         <td><a class='btn btn-primary'
-                                         href='{% url "dashboard-toggle-acceptance" tender_id=tender.id %}' >Reject</a></td>
+                                         href='{% url "dashboard:toggle-acceptance" tender_id=tender.id %}' >Reject</a></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -66,11 +66,11 @@
                                     {% for snippet in snippets %} 
                                     <tr class="gradeA">
                                         <td>{{forloop.counter}}</td>
-                                        <td>{{snippet.id}}</td>
-                                        <td><a href='{{snippet.image.url}}'>{{snippet.image}}</a></td>
+                                        <td><a href='{{snippet.image.url}}'>{{snippet.id}}</a></td>
+                                        <td>{{snippet.text}}</td>
                                         <td>{{snippet.bw_rate}}%</td>
                                         <td><a class='btn btn-success'
-                                         href='{% url "dashboard-toggle-acceptance" tender_id=snippet.id %}' >Approve</a></td>
+                                         href='{% url "dashboard:toggle-acceptance" tender_id=snippet.id %}' >Approve</a></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

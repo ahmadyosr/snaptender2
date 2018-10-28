@@ -21,6 +21,9 @@ class Publisher(models.Model):
 class Newspaper(models.Model):
 	is_extracted = models.BooleanField(default=False)
 	is_splitted = models.BooleanField(default=False)
+	is_ocr = models.BooleanField(default=False)
+	
+
 	title = models.CharField(blank=True, max_length=50,choices=NEWSPAPER_CHOICES)
 	publish_date = models.DateField(null=True, blank=True, auto_now_add=False)
 	file = models.FileField(blank=False, null=False, upload_to='newspapers_pdfs/', unique=True)

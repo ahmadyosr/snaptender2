@@ -7,10 +7,9 @@ from dashboard.views import extract_paper_
 def run():
 	paper = Newspaper.objects.last()
 	# print(paper.file.name)
-	snpts = extract_paper_(paper)
-
-
-
-	print(snpts[0].image.path)
-	print(snpts[0].image.url)
-	print(snpts[0].image.name)
+	# snpts = extract_paper_(paper)
+	snpts = paper.snippet_set.all()
+	for s in snpts : 
+		print(snpts[0].bw_rate)
+	# print(snpts[0].image.url)
+	# print(snpts[0].image.name)

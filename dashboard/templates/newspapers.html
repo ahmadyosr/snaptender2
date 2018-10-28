@@ -36,6 +36,7 @@
                                         <th>Newspaper</th>
                                         <th>Is splitted</th>
                                         <th>Is extracted</th>
+                                        <th>Is OCR-ed</th>
                                         <th>Date</th>
                                         <th></th>
                                     </tr>
@@ -71,6 +72,19 @@
                                             No
                                             {% endif %}
 
+                                        </td>
+                                        <td>
+                                            {% if pdf.is_ocr %} 
+                                            done
+                                            {% elif pdf.is_splitted and pdf.is_extracted %} 
+                                            <form action='{% url "dashboard:ocr_paper" paper_id=pdf.id %}' 
+                                            method='POST'>
+                                                {% csrf_token %}
+                                                <input type='submit'  class='btn btn-success' value='ocr'>
+                                            </form>
+                                            {% else %}
+                                            No
+                                            {% endif %}
                                         </td>
                                         <td>{{pdf.publish_date}}</td>
                                         <td>

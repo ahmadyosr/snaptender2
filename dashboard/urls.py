@@ -14,6 +14,7 @@ urlpatterns = [
 	path('newspaper/<int:paper_id>/', views.newspaper, name='newspaper'),
 
 	path('extract_paper/<int:paper_id>/', views.extract_paper, name='extract_paper'),
-	path('split_paper/<int:paper_id>/', views.split_paper, name='split_paper')
+	path('split_paper/<int:paper_id>/', views.split_paper, name='split_paper'),
+	path('ocr_paper/<int:paper_id>/', views.ocr_paper, name='ocr_paper')
 ]
 

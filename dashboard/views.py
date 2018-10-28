@@ -9,6 +9,9 @@ from modules.extractors import BoxesExtractor
 from modules.splitter import split
 from pdf2image import convert_from_path
 from catalogue.forms import NewspaperForm
+from modules.ocr.ocr import  OceanOCR
+import cv2
+
 
 """ utility
 """
@@ -31,13 +34,23 @@ def split_to_papers(paper):
 	result = convert_from_path(paper.file.path, output_folder=pages_dir, thread_count=4, fmt='jpg')
 	
 	files = []
+
 	for i,f in enumerate(result):
 		img_name = f.filename.split('/')[-1]
-		file_name_ = os.path.join(settings.ANY_NEWSPAPERS_PAGES_DIR_NAME, paper_name, img_name)
+
+		file_name_ = os.path.join(settings.NEWSPAPERS_DATA_DIR_NAME,
+						paper_name,
+						settings.ANY_NEWSPAPERS_PAGES_DIR_NAME,
+						img_name)
+
 		files += [NewspaperPage(page_no=i, newspaper=paper, image=file_name_)]
 		
 	NewspaperPage.objects.bulk_create(files)
-
+	for f in files : 
+		print('file--')
+		print(f.image.name)
+		print(f.image.path)
+		print(f.image.url)
 	return files
 
 
@@ -65,6 +78,7 @@ def get_page_rectangles(p):
 	snippets = []
 
 	for file_name, bw_rate in rectangles:
+		print('BW RATE >>> ' , bw_rate)
 		file_name_ = os.path.join(settings.NEWSPAPERS_DATA_DIR_NAME,
 								paper_name,
 								settings.ANY_NEWSPAPERS_SNIPPETS_DIR_NAME,
@@ -86,6 +100,7 @@ def extract_paper_(paper):
 
 	pages = NewspaperPage.objects.filter(newspaper=paper)
 	paper_snippets = [] 	
+
 	for p in pages : 
 		snippets = get_page_rectangles(p)
 		
@@ -190,7 +205,35 @@ def extract_paper(request, paper_id):
 		extract_paper_(paper)
 		paper.is_extracted = True
 		paper.save() 
+
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-
 	return HttpResponse(status=403)	
+
+def ocr_paper(request, paper_id):
+	if request.method == 'POST':
+		paper = Newspaper.objects.get(id=paper_id)
+		snippets = paper.snippet_set.all()
+
+		for s in snippets : 
+			im_path = s.image.path
+			size = os.stat(im_path).st_size 
+			im = cv2.imread(im_path)
+
+			if size > 1024000 : 
+				continue 
+						
+			try :
+				s.text = OceanOCR.get_image_text(im)
+				if s.text : 
+					s.save()
+
+			except Exception as e :
+				with open('log.txt', 'w') as f:
+					f.write(str(e))
+
+		paper.is_ocr = True
+		paper.save()			
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	return HttpResponse(status=403)
