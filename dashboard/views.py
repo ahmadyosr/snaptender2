@@ -78,7 +78,6 @@ def get_page_rectangles(p):
 	snippets = []
 
 	for file_name, bw_rate in rectangles:
-		print('BW RATE >>> ' , bw_rate)
 		file_name_ = os.path.join(settings.NEWSPAPERS_DATA_DIR_NAME,
 								paper_name,
 								settings.ANY_NEWSPAPERS_SNIPPETS_DIR_NAME,
@@ -88,7 +87,7 @@ def get_page_rectangles(p):
 				 page = p,
 				 extract_date=datetime.date.today(), 
 				 image=file_name_, 
-				 bw_rate=bw_rate)
+				 bw_rate=bw_rate*100)
 		
 		snippets += [s]
 
@@ -214,14 +213,14 @@ def ocr_paper(request, paper_id):
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
 		snippets = paper.snippet_set.all()
+		print(snippets)
 
 		for s in snippets : 
 			im_path = s.image.path
 			size = os.stat(im_path).st_size 
 			im = cv2.imread(im_path)
-
 			if size > 1024000 : 
-				continue 
+				continue
 						
 			try :
 				s.text = OceanOCR.get_image_text(im)
@@ -229,6 +228,7 @@ def ocr_paper(request, paper_id):
 					s.save()
 
 			except Exception as e :
+				print(str(e))
 				with open('log.txt', 'w') as f:
 					f.write(str(e))
 

@@ -37,7 +37,6 @@ class OceanOCR():
 
 	@staticmethod
 	def get_image_text(tender):
-		print('enter tender text')
 		r = OceanOCR.make_ocr_api_call(tender)
 
 		decoder = json.JSONDecoder()
@@ -52,11 +51,7 @@ class OceanOCR():
 				print(parsed_text)
 
 		except : 
-			print('----PARSED TEXT ERROR KEY')
-			# cv2.imshow('error in this', tender)
-			# cv2.waitKey(0)
-			print(r.text)
-			print('-----error printed')
-
+			pass 
+			
 		return parsed_text
 
