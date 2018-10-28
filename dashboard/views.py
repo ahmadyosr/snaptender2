@@ -14,17 +14,26 @@ from catalogue.forms import NewspaperForm
 """
 def split_to_papers(paper):
 	paper_name = paper.file.name.split('/')[-1]
-	output_path = os.path.join(settings.NEWSPAPERS_PAGES_DIR, paper_name)
-	
-	if not os.path.exists(output_path):
-		os.makedirs(output_path)
 
-	result = convert_from_path(paper.file.path, output_folder=output_path, thread_count=4, fmt='jpg')
+	if not os.path.exists(settings.NEWSPAPERS_DATA_DIR):
+		os.makedirs(settings.NEWSPAPERS_DATA_DIR)
+
+	paper_dir = os.path.join(settings.NEWSPAPERS_DATA_DIR , paper_name)
+	
+	if not os.path.exists(paper_dir):
+		os.makedirs(paper_dir)
+
+	pages_dir = os.path.join(paper_dir, settings.ANY_NEWSPAPERS_PAGES_DIR_NAME)
+	
+	if not os.path.exists(pages_dir):
+		os.makedirs(pages_dir)
+
+	result = convert_from_path(paper.file.path, output_folder=pages_dir, thread_count=4, fmt='jpg')
 	
 	files = []
 	for i,f in enumerate(result):
 		img_name = f.filename.split('/')[-1]
-		file_name_ = os.path.join(settings.NEWSPAPERS_PAGES_DIR_NAME, paper_name, img_name)
+		file_name_ = os.path.join(settings.ANY_NEWSPAPERS_PAGES_DIR_NAME, paper_name, img_name)
 		files += [NewspaperPage(page_no=i, newspaper=paper, image=file_name_)]
 		
 	NewspaperPage.objects.bulk_create(files)
@@ -35,10 +44,10 @@ def split_to_papers(paper):
 def get_page_rectangles(p):
 	paper_name = p.newspaper.file.name.split('/')[-1]
 	
-	if not os.path.exists(settings.NEWSPAPERS_PAGES_DIR):
-		os.makedirs(settings.NEWSPAPERS_PAGES_DIR)
+	if not os.path.exists(settings.NEWSPAPERS_DATA_DIR):
+		os.makedirs(settings.NEWSPAPERS_DATA_DIR)
 
-	pages_dir = os.path.join(settings.NEWSPAPERS_PAGES_DIR , paper_name)
+	pages_dir = os.path.join(settings.NEWSPAPERS_DATA_DIR , paper_name)
 	
 	if not os.path.exists(pages_dir):
 		os.makedirs(pages_dir)
@@ -56,7 +65,7 @@ def get_page_rectangles(p):
 	snippets = []
 
 	for file_name, bw_rate in rectangles:
-		file_name_ = os.path.join(settings.NEWSPAPERS_PAGES_DIR_NAME,
+		file_name_ = os.path.join(settings.NEWSPAPERS_DATA_DIR_NAME,
 								paper_name,
 								settings.ANY_NEWSPAPERS_SNIPPETS_DIR_NAME,
 								file_name)
@@ -80,11 +89,11 @@ def extract_paper_(paper):
 	for p in pages : 
 		snippets = get_page_rectangles(p)
 		
-		# if snippets : 
-		# 	p.has_snippets = True
-		# 	p.save() 
+		if snippets : 
+			p.has_snippets = True
+			p.save() 
 
-		# Snippet.objects.bulk_create(snippets)			
+		Snippet.objects.bulk_create(snippets)			
 		paper_snippets += snippets
 
 	return paper_snippets 
@@ -178,7 +187,7 @@ def extract_paper(request, paper_id):
 		if paper.is_extracted == True : 
 			return HttpResponse('Paper %d already done' % paper.id )
 
-		extract_paper(paper)
+		extract_paper_(paper)
 		paper.is_extracted = True
 		paper.save() 
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
