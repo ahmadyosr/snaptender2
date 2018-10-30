@@ -23,5 +23,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('catalogue/', include('catalogue.urls')),
     path('dashboard/', include('dashboard.urls', namespace='dashboard')),
-    path('apis/', include('apis.urls'))
+    path('apis/', include('apis.urls')),
+    path('authentication/', include('authentication.urls', namespace='authentication'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

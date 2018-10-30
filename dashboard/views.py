@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from catalogue.models import Newspaper, NewspaperPage, Snippet
 import datetime
 from django.conf import settings 
@@ -12,6 +12,7 @@ from catalogue.forms import NewspaperForm
 from modules.ocr.ocr import  OceanOCR, config
 import cv2
 from django.db.models import Q
+from django.contrib.auth import authenticate, login as contrib_login
 
 
 """ utility
@@ -266,3 +267,20 @@ def find_tenders(request, paper_id):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	return HttpResponse(status=403)
+
+
+
+def login(request):
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		user = authenticate(request, username=username, password=password)
+
+		if user : 
+			contrib_login(request, user)
+			return redirect('dashboard:dashboard')
+
+		else : 
+			return HttpResponse('failed to login')
+
+	return render(request, 'login.html')
