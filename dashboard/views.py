@@ -1,3 +1,5 @@
+from django.urls import reverse 
+
 from django.shortcuts import render, redirect
 from catalogue.models import Newspaper, NewspaperPage, Snippet
 import datetime
@@ -9,22 +11,14 @@ from modules.extractors import BoxesExtractor
 from modules.splitter import split
 from pdf2image import convert_from_path
 from catalogue.forms import NewspaperForm
-from modules.ocr.ocr import  OceanOCR, config
+from modules.ocr.ocr import  OceanOCR
 import cv2
 from django.db.models import Q
 from django.contrib.auth import authenticate, login as contrib_login
-
+from django.contrib.auth.decorators import login_required
 
 """ utility
 """
-def find_keyword(snippet, keywords_label):
-	keywords = config[keywords_label]
-
-	for keyword in keywords: 
-		if snippet.text.find(keyword) > -1:
-			return True
-
-	return False
 
 def split_to_papers(paper):
 	paper_name = paper.file.name.split('/')[-1]
@@ -121,11 +115,13 @@ def extract_paper_(paper):
 """
 Catalogue views 
 """
-
+@login_required(login_url='/dashboard/login/')
 def dashboard(request):
 	context = {}
 	return render(request, 'dashboard.html', context)
 
+
+@login_required(login_url='/dashboard/login/')
 def upload(request):
 	papers = [] 
 
@@ -136,12 +132,14 @@ def upload(request):
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@login_required(login_url='/dashboard/login/')
 def delete_newspaper(request, paper_id):
 	if request.method == 'POST': 
 		Newspaper.objects.get(id=paper_id).delete()
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@login_required(login_url='/dashboard/login/')
 def snippets(request):
 	context = {} 
 	filter_ = request.GET.get('filter')
@@ -166,11 +164,13 @@ def snippets(request):
 
 	return render(request, 'tenders.html', context)
 
+@login_required(login_url='/dashboard/login/')
 def toggle_acceptance(request, tender_id):
 	t = Snippet.objects.get(id=tender_id)
 	Snippet.objects.filter(id=tender_id).update(is_tender= not t.is_tender)
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@login_required(login_url='/dashboard/login/')
 def approve_category(request, tender_id):
 	t = Snippet.objects.get(id=tender_id)
 	t.category = t.suggested_category 
@@ -179,6 +179,7 @@ def approve_category(request, tender_id):
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+@login_required(login_url='/dashboard/login/')
 def newspaper(request, paper_id):
 	context = {}
 	snippets = Snippet.objects.all().filter(newspaper=paper_id)
@@ -189,11 +190,13 @@ def newspaper(request, paper_id):
 
 	return render(request, 'newspaper.html', context)
 
+@login_required(login_url='/dashboard/login/')
 def newspapers(request):
 	context = {} 
 	context['pdfs'] = Newspaper.objects.all().order_by('-id')
 	return render(request, 'newspapers.html', context)
 
+@login_required(login_url='/dashboard/login/')
 def split_paper(request, paper_id):
 
 	if request.method == 'POST':
@@ -210,6 +213,8 @@ def split_paper(request, paper_id):
 
 	return HttpResponse(status=403)	
 
+
+@login_required(login_url='/dashboard/login/')
 def extract_paper(request, paper_id):
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
@@ -225,6 +230,7 @@ def extract_paper(request, paper_id):
 
 	return HttpResponse(status=403)	
 
+@login_required(login_url='/dashboard/login/')
 def ocr_paper(request, paper_id):
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
@@ -254,14 +260,15 @@ def ocr_paper(request, paper_id):
 	return HttpResponse(status=403)
 
 
+@login_required(login_url='/dashboard/login/')
 def find_tenders(request, paper_id):
 	if request.method == 'POST':
 		paper = Newspaper.objects.get(id=paper_id)
 		snippets = paper.snippet_set.all()
 
 		for s in snippets :
-			s.is_tender = find_keyword(s, 'TENDERS_KEYWORDS')
-			s.is_auction = find_keyword(s,'AUTCTION_KEYWORDS')
+			s.is_tender = s.check_if_tender()
+			s.is_auction = s.check_if_auction()
 			s.save()
 
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

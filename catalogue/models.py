@@ -1,10 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
+from modules.ocr.ocr import config
 
 NEWSPAPER_CHOICES = (
     ('ADDUSTOUR', 'addustour'),
     ('ALRAI', 'alrai'),
 )
+
+def find_keyword(snippet, keywords_label):
+	keywords = config[keywords_label]
+
+	for keyword in keywords: 
+		if snippet.text.find(keyword) > -1:
+			return True
+
+	return False
 
 class Category(models.Model):
 	title = models.CharField(max_length=50)
@@ -42,8 +52,8 @@ class NewspaperPage(models.Model):
 	is_extracted = models.BooleanField(default=False)
 
 class Snippet(models.Model):
-	newspaper = models.ForeignKey(Newspaper, null=True, on_delete=models.SET_NULL)
-	page = models.ForeignKey(NewspaperPage, null=True, on_delete=models.SET_NULL)
+	newspaper = models.ForeignKey(Newspaper, blank=True, null=True, on_delete=models.SET_NULL)
+	page = models.ForeignKey(NewspaperPage,blank=True, null=True, on_delete=models.SET_NULL)
 
 	title = models.CharField(blank=True, max_length=50)
 	extract_date = models.DateField(auto_now_add=True)
@@ -60,11 +70,21 @@ class Snippet(models.Model):
 	is_republished = models.BooleanField(default=False)
 	is_active = models.BooleanField(default=False)
 
-	image = models.FileField(upload_to='tenders_images/')
+	image = models.FileField(blank=True, null=True, upload_to='tenders_images/')
 	text = models.CharField(blank=True, max_length=200)
 	suggested_category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL, related_name='suggested_category')
 	category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL)
 	bw_rate = models.IntegerField(default=0)
 	
+
+	def check_if_tender(self):
+		return find_keyword(self, 'TENDERS_KEYWORDS')
+
+	def check_if_auction(self):
+		return find_keyword(self, 'AUCTION_KEYWORDS')
+
 	def __str__(self):
-		return self.title
+		if self.text == '':
+			return self.image.url
+		else : 
+			return self.text[:int(len(self.text)/20)]

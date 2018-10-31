@@ -7,7 +7,7 @@ config = {
 							'بيع', 
 							'شراء'
 							], 
-		'AUTCTION_KEYWORDS': ['مزاد', 
+		'AUCTION_KEYWORDS': ['مزاد', 
 							'المزاد', 
 							'علني', 
 							'العلني',

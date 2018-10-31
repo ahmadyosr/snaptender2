@@ -6,11 +6,8 @@ this should be executed as following
 ./manage.py shell < <path_for_this_file>
 ie : 
 python manage.py shell < modules/ocr/test_ocr.py
-
-
 --------------------
 """
-
 from modules.ocr.ocr import  OceanOCR
 import cv2
 from catalogue.models import Snippet
@@ -35,19 +32,21 @@ c = 0
 for s in snippets : 
 	print(s.id)
 	if not s.text :
+		try :
+			im = s.image.path
+			size = os.stat(im).st_size 
+			im = cv2.imread(im)
+			print(im.shape)
+			print('Done so far : ' , c)
 
-		im = s.image.path
-		size = os.stat(im).st_size 
-	
-		im = cv2.imread(im)
-		c+= 1
-		print(im.shape)
-		print('Done so far : ' , c)
-
-		# s.text = OceanOCR.get_image_text(im)
-		# if is_tender(s.text):
-		# 	s.is_tender = True 
-		print(size)
+			# s.text = OceanOCR.get_image_text(im)
+			# if is_tender(s.text):
+			# 	s.is_tender = True 
+			print(size)
+		except FileNotFoundError as e:
+			print(str(e))
+			c += 1
+			continue
 
 		if size > 1024000 : 
 			continue 
