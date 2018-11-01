@@ -83,7 +83,9 @@ class Snippet(models.Model):
 	image = models.FileField(blank=True, null=True, upload_to='tenders_images/')
 	text = models.CharField(blank=True, max_length=200)
 	suggested_category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL, related_name='suggested_category')
-	category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL)
+	# category = models.ForeignKey(Category,blank=True, null=True, on_delete=models.SET_NULL)
+	category = models.CharField( blank=True, max_length=200)
+
 	bw_rate = models.IntegerField(default=0)
 	
 

@@ -15,7 +15,6 @@ import cv2
 from django.db.models import Q
 from django.contrib.auth import authenticate, login as contrib_login
 from django.contrib.auth.decorators import login_required
-
 """ utility
 """
 

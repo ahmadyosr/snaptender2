@@ -1,0 +1,80 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<style>
+#btns{
+    bottom: 0;
+    right:0;
+	padding:15px;
+    position: -webkit-sticky;
+    position: fixed;
+    background-color: gray;
+    width: 30%;
+}
+a{
+	opacity: 2;
+}
+div#counter {
+  font-weight: normal;
+  letter-spacing:5px;
+  padding: 6px;
+  font-size: 1.8em;
+  font-family: 'Gill Sans';
+  width: 500px;
+  text-align: center;
+  height: auto;
+  color: #333;
+  display:block;
+  margin:0px auto;
+  vertical-align:middle;
+}
+
+</style>  
+<div class="container">
+  <div class="row" style='text-align: center;'>
+
+  	<div style='padding:300px;padding-top:0;' class='col-md-12' >
+		<img style='width:100%;margin-left: auto;margin-right:auto;'
+		 src='{{tender.image.url}}'  >
+	</div>
+  <div id='btns' class='col-md-12' >
+  	<a href='{% url "catalogue:labeling" %}?label=construction&tender_id={{tender.id}}' class='btn btn-success btn-lg '>انشاءات/صيانة ابنية</a><br>
+  	<a href='{% url "catalogue:labeling" %}?label=streets&tender_id={{tender.id}}' class='btn btn-primary btn-lg '>طرق وجسور</a><br>
+  	<a href='{% url "catalogue:labeling" %}?label=import_buy&tender_id={{tender.id}}' class='btn btn-danger btn-lg '>شراء/توريد/استئجار</a><br>
+  	<a href='{% url "catalogue:labeling" %}?label=sell_auction&tender_id={{tender.id}}' class='btn btn-warning btn-lg '>بيع أو /مزاد/تاجير</a><br>
+  	<a href='{% url "catalogue:labeling" %}?label=idk&tender_id={{tender.id}}' class='btn btn-default btn-lg '>idk</a><br><br>
+            <div id="counter"></div>
+<br>
+  	<br>{{done}}/{{remaining}}<a href='{% url "catalogue:labeling" %}?remove_last_tender=True' style='color:white;'>remove last </a>
+
+  </div>
+  </div>
+</div>
+<script>
+var start = 0;
+var speed = 100;
+$(document).ready(function () {
+    go();
+    setInterval(function () {
+        go();
+    }, speed);
+});
+function go() {
+    $("#counter").html(start.toFixed(0));
+    start += 0.125;
+}
+</script>
+</body>
+
+</html>
