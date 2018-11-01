@@ -34,10 +34,11 @@
                                         <th >id</th>
                                         <th>Title</th>
                                         <th>Newspaper</th>
-                                        <th>Is splitted</th>
-                                        <th>Is extracted</th>
-                                        <th>Is OCR-ed</th>
-                                        <th>filter tenders</th>
+                                        <th>1 <br>Is splitted</th>
+                                        <th>2 <br>Is extracted</th>
+                                        <th>3 <br>Is OCR-ed</th>
+                                        <th>4 <br>filter tenders</th>
+                                        <th>5 <br>Classify</th>
                                         <th>Date</th>
                                         <th></th>
                                     </tr>
@@ -97,6 +98,17 @@
                                                 <input type='submit'  class='btn btn-success' value='find tenders'>
                                             </form>
                                             {% endif %} 
+                                        </td>
+                                        <td>
+                                            {% if not pdf.is_find_tenders %} 
+                                                find tenders first
+                                            {% else %} 
+                                                <form action='{% url "dashboard:classify_paper" paper_id=pdf.id %}' 
+                                                method='GET'>
+                                                    <input type='submit'  class='btn btn-success' value='classify'>
+                                                </form>
+                                            {% endif %} 
+
                                         </td>
                                         <td>{{pdf.publish_date}}</td>
                                         <td>

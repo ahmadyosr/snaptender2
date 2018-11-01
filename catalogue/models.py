@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from modules.ocr.ocr import config
-
+import os
 NEWSPAPER_CHOICES = (
     ('ADDUSTOUR', 'addustour'),
     ('ALRAI', 'alrai'),
@@ -38,6 +38,16 @@ class Newspaper(models.Model):
 	title = models.CharField(blank=True, max_length=50,choices=NEWSPAPER_CHOICES)
 	publish_date = models.DateField(null=True, blank=True, auto_now_add=False)
 	file = models.FileField(blank=False, null=False, upload_to='newspapers_pdfs/', unique=True)
+
+	def delete_file(self):
+		if self.file : 
+			path =  self.file.path
+		else : 
+			return 
+
+		if os.path.exists(path):
+			os.remove(path)
+
 	
 	def __str__(self):
 		return self.file.name
@@ -77,12 +87,26 @@ class Snippet(models.Model):
 	bw_rate = models.IntegerField(default=0)
 	
 
+	def delete_file(self):
+		if self.image : 
+			path =  self.image.path
+		else : 
+			return 
+
+		if os.path.exists(path):
+			os.remove(path)
+
+
 	def check_if_tender(self):
 		return find_keyword(self, 'TENDERS_KEYWORDS')
 
 	def check_if_auction(self):
 		return find_keyword(self, 'AUCTION_KEYWORDS')
 
+	def classify(self):
+		self.category = self.category
+		self.save()
+		
 	def __str__(self):
 		if self.text == '':
 			return self.image.url

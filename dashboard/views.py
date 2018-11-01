@@ -1,5 +1,4 @@
 from django.urls import reverse 
-
 from django.shortcuts import render, redirect
 from catalogue.models import Newspaper, NewspaperPage, Snippet
 import datetime
@@ -132,11 +131,18 @@ def upload(request):
 
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-@login_required(login_url='/dashboard/login/')
+# @login_required(login_url='/dashboard/login/')
 def delete_newspaper(request, paper_id):
-	if request.method == 'POST': 
-		Newspaper.objects.get(id=paper_id).delete()
+	paper = Newspaper.objects.get(id=paper_id)
+	paper.delete_file()
+	paper.delete()
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+# @login_required(login_url='/dashboard/login/')
+def delete_tender(request, tender_id):
+	Snippet.objects.get(id=tender_id).delete()
+	paper.delete_file()
+	paper.delete()
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='/dashboard/login/')
@@ -291,3 +297,19 @@ def login(request):
 			return HttpResponse('failed to login')
 
 	return render(request, 'login.html')
+
+
+def classify_paper(request, paper_id):
+	paper = Newspaper.objects.get(id=paper_id)
+	tenders = Snippet.objects.filter(newspaper=paper_id, is_tender=True)
+	
+	for t in tenders : 
+		t.classify()
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def classify_tender(request, tender_id):
+	tender = Snippet.objects.get(id=tender_id)
+	t.classify()
+
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
