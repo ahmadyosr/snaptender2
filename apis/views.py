@@ -35,7 +35,7 @@ class Register(APIView):
     permission_classes = (permissions.AllowAny,)
     def post(self, request, *args, **kwargs):
         if not request.data:
-            return Response({'Error': "Please provide username/password/email"}, status="400")
+            return Response({'Error': "Please provide username/password/"}, status="400")
 
         username = request.data['username']
         password = request.data['password']
