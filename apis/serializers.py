@@ -3,33 +3,28 @@ from authentication.models import UserProfile
 from rest_framework import serializers
 from django.conf import settings 
 import jwt
-class RegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
-    # token = serializers.CharField(source='get_token', read_only=True)
-    token = serializers.CharField(required=True)
-    password = serializers.CharField(write_only=True)
-    
-    def get_token(self):
-        return 'fsdfsd'
 
-    # def get_cleaned_data(self):
-    #     return {
-    #         'username': self.validated_data.get('username', ''),
-    #         'password': self.validated_data.get('password', ''),
-    #         'email': self.validated_data.get('email', ''),
-    #         'token': '656565',
-    #     }
+class RegisterSerializer(serializers.ModelSerializer):
+    token = serializers.SerializerMethodField()
 
-    def create(self, request):
-        username = self.validated_data.get('username') 
-        email = self.validated_data.get('email') 
-        password = self.validated_data.get('password') 
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'password', 'token')
+        extra_kwargs = {'password': {'write_only': True}}
 
-        user = User.objects.create_user(username = username, password=password,email=email)
+
+    def get_token(self, obj):
+        return obj.userprofile.token 
+
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            username=validated_data['username']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+
         encoded_token = jwt.encode({'user_id': user.id}, 'SECRET', algorithm='HS256')
-
         user.userprofile.token = encoded_token
         user.save()
         return user
-

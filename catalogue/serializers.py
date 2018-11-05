@@ -26,10 +26,10 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 			return settings.HOST_NAME + object.image.url
 		return '' 
 
-class CategoryList(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
 	class Meta : 
 		model = Category
-		fields = ('title')
+		fields = ('id', 'title')
 
 
 # class LoginList(serializers.ModelSerializer):

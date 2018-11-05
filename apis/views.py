@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from catalogue.models import Snippet, Category
 from django.contrib.auth.models import User 
-from catalogue.serializers import TenderSnippetSerializer
+from catalogue.serializers import TenderSnippetSerializer, CategorySerializer
 from apis.serializers import RegisterSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -18,13 +18,13 @@ import jwt
 # Create your views here.
 
 class SnippetList(generics.ListCreateAPIView):
-    queryset = Snippet.objects.filter(Q(is_tender=True) | Q(is_auction=True))[:5]
+    queryset = Snippet.objects.filter(Q(is_tender=True) | Q(is_auction=True))[:100]
     serializer_class = TenderSnippetSerializer
 
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
-    serializer_class = TenderSnippetSerializer
+    serializer_class = CategorySerializer
 
 
 
@@ -46,29 +46,18 @@ class Register(APIView):
         except User.DoesNotExist:
 
             serializer = RegisterSerializer(data=request.data)
+
             if serializer.is_valid():
                 user = serializer.save()
                 print('USER ---------' , user)
-            if user:
-                print('------------------------>>>>>>')
-                # payload = {
-                #     'id': user.id,
-                #     'email': user.email,
-                # }
-                # jwt_token = {'token': jwt.encode(payload, "SECRET_KEY")}
 
-                # return HttpResponse(
-                #     json.dumps(jwt_token),
-                #     status=200,
-                #     content_type="application/json"
-                # )
-                print(serializer.data)
-                # print(serializer.cleaned_data)
-                print(serializer.validated_data)
-
-                return Response(serializer.validated_data, status=200)
+                if user:
+                    return Response(serializer.data, status=200)
+            else : 
+                return Response(serializer.errors, status=200)
 
 class Login(APIView):
+    # refresh token/ assign new token
 
     def post(self, request, *args, **kwargs):
         # if not request.data:
@@ -100,9 +89,13 @@ class Login(APIView):
         #       content_type="application/json"
         #     )
         pass
+
+
 class Logout(APIView):
     """
     Logout .
+    # simply delete the token to force a login
+
     """
     def post(self, request, format=None):
         serializer = SnippetSerializer(data=request.data)
