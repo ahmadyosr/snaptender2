@@ -13,7 +13,7 @@ class BoxesExtractor():
 		self.image_path = image_path
 		self.image = None 
 		self.thresh = None 
-		self.detected_rectangles = []
+		self.buildings = []
 		self.cropped_rectangles = []
 		
 		return 

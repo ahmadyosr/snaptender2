@@ -8,7 +8,8 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Snippet
-		fields = ('start_date',
+		fields = ('id',
+		'start_date',
 		'finish_date',
 		'title',
 		'newspaper',
@@ -21,11 +22,16 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 		'image_url'
 		)
 
+	
 	def get_image_url(self, object):
-		if object.image : 
-			return settings.HOST_NAME + object.image.url
-		return '' 
+		try :
+			if object.image :  
+				return settings.HOST_NAME + object.image.url
+		
+		except AttributeError:
+			return '' 
 
+		return ''
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta : 
 		model = Category

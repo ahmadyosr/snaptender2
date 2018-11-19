@@ -4,6 +4,8 @@ from shutil import copyfile
 from catalogue.models import Newspaper
 import os 
 
+
+
 class ClassifyPaperViewTestCase(NewspaperTestCase):
     def test_url(self):
     	# check the validity of url 
@@ -45,6 +47,7 @@ class DeleteNewspaperViewTestCase(NewspaperTestCase):
 
         self.assertEqual(len(paper_exists), 0)
         self.assertFalse(exists)
+
 
 
 # class DeleteTenderViewTestCase(TenderTestCase):

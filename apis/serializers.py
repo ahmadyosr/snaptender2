@@ -23,7 +23,23 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
 
-        encoded_token = jwt.encode({'user_id': user.id}, 'SECRET', algorithm='HS256')
+        encoded_token = jwt.encode({'user_id': user.id, 
+                                    'username':user.username }, 'SECRET', algorithm='HS256')
         user.userprofile.token = encoded_token
         user.save()
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    token = serializers.SerializerMethodField()
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def get_token(self, obj):
+        return obj.userprofile.token
+
+    def update(self,instance,  validated_data):
+        new_token = jwt.encode({'user_id': instance.id}, 'SECRET', algorithm='HS256')
+        instance.userprofile.token = new_token
+        instance.save()
+        return instance
