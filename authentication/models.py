@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from catalogue.models import Snippet
+from catalogue.models import Snippet, Category
 # Create your models here.
 
 class UserProfile(models.Model):
@@ -10,7 +10,7 @@ class UserProfile(models.Model):
 	token = models.TextField(max_length=500, blank=True)
 
 	snippets = models.ManyToManyField(Snippet)
-
+	categories = models.ManyToManyField(Category)
 
 
 @receiver(post_save, sender=User)

@@ -11,7 +11,7 @@ urlpatterns = [
 	path('favorite/<int:pk>/', views.FavoriteApi.as_view(), name='snippet-favorite'),
 	path('favorites/', views.FavoriteList.as_view(), name='favorites'),
 
-	path('categories/', views.CategoryList.as_view(), name='categories'),
+	path('add_preferences/', views.AddPreferencesList.as_view(), name='add-preferences'),
 	path('auth/login/', views.LoginApi.as_view(), name='login'),
 	path('auth/register/', views.RegisterApi.as_view(), name='register')
 ]

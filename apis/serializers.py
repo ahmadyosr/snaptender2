@@ -4,13 +4,16 @@ from rest_framework import serializers
 from django.conf import settings 
 import jwt
 from rest_framework import serializers
-
 from catalogue.models import Snippet
+from catalogue.serializers import CategorySerializer
 
-class TESTSnippetSerializer(serializers.Serializer):
-    class Meta : 
-        model = Snippet             
-        fields = ('__all__')
+
+
+class PreferencesSerializer(serializers.Serializer):
+    categories = CategorySerializer(many = True)
+    token = serializers.CharField(write_only=True)
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField()
 

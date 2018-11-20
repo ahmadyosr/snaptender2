@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from catalogue.models import Snippet, Category
 from django.contrib.auth.models import User 
-from catalogue.serializers import TenderSnippetSerializer, CategorySerializer, SnippetSerializer, SomeSerializer
-from apis.serializers import RegisterSerializer, LoginSerializer, TESTSnippetSerializer
+from catalogue.serializers import TenderSnippetSerializer, CategorySerializer, SnippetSerializer
+from apis.serializers import RegisterSerializer, PreferencesSerializer, LoginSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -60,14 +60,14 @@ class LoginApi(APIView):
 
         if not username or not password:
             return Response({'error': 'Invalid Credentials'},
-                            status=HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
         
         user = authenticate(username=username, password= password)
 
 
         if not user : 
             return Response({'error': 'User Does Not Exist'},
-                            status=HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
         else : 
             serializer = LoginSerializer(user, data=request.data)
 
@@ -151,4 +151,20 @@ class FavoriteList(APIView):
 
         serializer = SnippetSerializer(snippets, many=True,)
         return Response(serializer.data, status=200)
+
+
+
+
+class AddPreferencesList(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = PreferencesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print(serializer.data)
+
+        return Response(serializer.data, status=200)
+
+
 

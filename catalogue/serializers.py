@@ -42,6 +42,7 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 	# 	return ''
 
 class CategorySerializer(serializers.ModelSerializer):
+	title = serializers.CharField(required=False)
 	class Meta : 
 		model = Category
 		fields = ('id', 'title')

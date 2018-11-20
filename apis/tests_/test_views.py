@@ -4,7 +4,7 @@ import random
 import json
 from rest_framework import status
 from django.contrib.auth.models import User
-from catalogue.models import Snippet
+from catalogue.models import Snippet, Category
 
 class RegisterAndLoginApiTestCase(TestCase):
 	"""Login api 
@@ -204,3 +204,20 @@ class FavoritesList(FavoriteTestCase):
 
 
 		
+
+class PreferencesTestCase(RegisterAndLoginApiTestCase):
+
+	def test_set_preferences(self):
+		self.test_register()
+		categories = [Category.objects.create(title='title is %d' % i ) for i in range(10)]
+		categories_ids = [{'id': c.id} for c in categories]
+		url = reverse('apis:add-preferences')
+		self.pref_payload = {'token':self.token , 'categories':categories_ids}
+
+		r = self.client.post(url,
+							json.dumps(self.pref_payload),
+							content_type='application/json'
+							)
+		self.assertEqual(r.status_code, status.HTTP_200_OK)
+		self.assertTrue(self.user.userprofile.categories.all().count(), len(categories))
+
