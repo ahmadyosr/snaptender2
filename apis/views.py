@@ -148,31 +148,7 @@ class FavoriteList(APIView):
         user = User.objects.get(id=user_id)
 
         snippets = user.userprofile.snippets.all()
-        snippets = Snippet.objects.all()[:10]
 
-        serializer = SnippetSerializer(snippets, many=True, data=request.data)
-        print(serializer.data)
-        if serializer.is_valid():
-            return Response(serializer.data, status=200)
-        else: 
-            return Response(serializer.errors, status=400)
-
-
-
-class TestList(generics.ListCreateAPIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = []
-
-    def post(self, request, *args, **kwargs):
-        snippets = Snippet.objects.all()
-        # snippets = [Category.objects.create(title='%d' % s) for s in range(20)]
-        xs = [s.__dict__ for s in snippets]
-        # print(xs)
-        serializer = SnippetSerializer(snippets, many=True, data={})
-    
-        if serializer.is_valid():
-            return Response(serializer.data, status=200)
-        else: 
-            return Response(serializer.errors, status=400)
-
+        serializer = SnippetSerializer(snippets, many=True,)
+        return Response(serializer.data, status=200)
 

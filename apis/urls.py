@@ -6,7 +6,6 @@ app_name = 'apis'
 
 urlpatterns = [
 	path('snippets/', views.SnippetList.as_view(), name='snippets'),
-	path('test/', views.TestList.as_view(), name='test'),
 	path('snippet/<int:pk>/', views.SnippetDetail.as_view(), name='snippet-detail'),
 
 	path('favorite/<int:pk>/', views.FavoriteApi.as_view(), name='snippet-favorite'),

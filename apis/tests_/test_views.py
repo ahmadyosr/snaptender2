@@ -185,37 +185,22 @@ class FavoriteTestCase(RegisterAndLoginApiTestCase):
 
 		
 
-# class FavoritesList(FavoriteTestCase):
+class FavoritesList(FavoriteTestCase):
 
-# 	def test_user_favs(self):
-# 		self.test_add_favorite()
-# 		url = reverse('apis:favorites')
-
-# 		r = self.client.post(url,
-# 							json.dumps(self.favorite_payload),
-# 							content_type='application/json'
-# 							)
-		
-# 		user_snippets_ids = self.user.userprofile.snippets.all()
-# 		# print(len(r.data))
-# 		print(r.data)
-
-# 		self.assertEqual(r.status_code, status.HTTP_200_OK)
-
-
-# 		
-
-class TestList(TestCase):
-
-	def test_the_test(self):
-		url = reverse('apis:test')
+	def test_user_favs(self):
+		self.test_add_favorite()
+		url = reverse('apis:favorites')
 
 		r = self.client.post(url,
-							json.dumps({}),
+							json.dumps(self.favorite_payload),
 							content_type='application/json'
 							)
 		
-		print(r.data)
-        # print(serializer.data)
-        
+		user_snippets_ids = list(self.user.userprofile.snippets.all().values_list('id'))
+		response_user_ids = [(s['id'],) for s in r.data]
+			
+		self.assertEqual(user_snippets_ids, response_user_ids)
 		self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+
+		
