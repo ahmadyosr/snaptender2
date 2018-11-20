@@ -3,7 +3,14 @@ from authentication.models import UserProfile
 from rest_framework import serializers
 from django.conf import settings 
 import jwt
+from rest_framework import serializers
 
+from catalogue.models import Snippet
+
+class TESTSnippetSerializer(serializers.Serializer):
+    class Meta : 
+        model = Snippet             
+        fields = ('__all__')
 class RegisterSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField()
 

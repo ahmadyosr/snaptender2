@@ -111,6 +111,7 @@ class Snippet(models.Model):
 		
 	def __str__(self):
 		if self.text == '':
-			return self.image.url
+			return '' 
+			# return self.image.url
 		else : 
-			return self.text[:int(len(self.text)/20)]
+			return self.text[:int(len(self.text)/10)]

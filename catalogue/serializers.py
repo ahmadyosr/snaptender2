@@ -2,9 +2,17 @@ from catalogue.models import Snippet, Category
 from rest_framework import serializers
 from django.conf import settings 
 
+class SnippetSerializer(serializers.ModelSerializer):
+	class Meta : 
+		model = Snippet
+		fields = ('id', 'start_date', 'finish_date')
+class SomeSerializer(serializers.Serializer):
+	start_data = serializers.CharField()
+
+	
 class TenderSnippetSerializer(serializers.ModelSerializer):
 	
-	image_url = serializers.SerializerMethodField()
+	# image_url = serializers.SerializerMethodField()
 
 	class Meta:
 		model = Snippet
@@ -16,29 +24,26 @@ class TenderSnippetSerializer(serializers.ModelSerializer):
 		'publisher',
 		'admin',
 		'is_active', 
-		'image', 
+		# 'image', 
 		'category', 
 
-		'image_url'
+		# 'image_url'
 		)
 
 	
-	def get_image_url(self, object):
-		try :
-			if object.image :  
-				return settings.HOST_NAME + object.image.url
+	# def get_image_url(self, object):
+	# 	try :
+	# 		if object.image :  
+	# 			return settings.HOST_NAME + object.image.url
 		
-		except AttributeError:
-			return '' 
+	# 	except AttributeError:
+	# 		return '' 
 
-		return ''
+	# 	return ''
+
 class CategorySerializer(serializers.ModelSerializer):
 	class Meta : 
 		model = Category
 		fields = ('id', 'title')
 
-
-# class LoginList(serializers.ModelSerializer):
-# 	class Meta : 
-# 		model = Category
-# 		fields = ('title')
+		

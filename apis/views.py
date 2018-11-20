@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from catalogue.models import Snippet, Category
 from django.contrib.auth.models import User 
-from catalogue.serializers import TenderSnippetSerializer, CategorySerializer
-from apis.serializers import RegisterSerializer, LoginSerializer
+from catalogue.serializers import TenderSnippetSerializer, CategorySerializer, SnippetSerializer, SomeSerializer
+from apis.serializers import RegisterSerializer, LoginSerializer, TESTSnippetSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -23,6 +23,7 @@ class SnippetList(generics.ListCreateAPIView):
     serializer_class = TenderSnippetSerializer
     permission_classes = (permissions.AllowAny,)
     authentication_classes = []
+
 
 class SnippetDetail(APIView):
     queryset = Snippet.objects.filter(Q(is_tender=True) | Q(is_auction=True))[:100]
@@ -107,18 +108,71 @@ class RegisterApi(APIView):
                     return Response(serializer.data, status=201)
             else : 
                 return Response(serializer.errors, status=400)
+        
+# class FavoriteList(APIView):
+#     def post(self, request, *args, **kwargs):
+
+class FavoriteApi(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+
+        token = request.data.get('token')
+        payload = jwt.decode(token, "SECRET", algorithm='HS256')
+        user_id = payload['user_id']
+        user = User.objects.get(id=user_id)
 
 
-class Logout(APIView):
-    """
-    Logout .
-    # simply delete the token to force a login
+        snippet_id = kwargs.get('pk')
+        snippet = Snippet.objects.filter(is_tender=True).get(id = snippet_id)
 
-    """
-    authentication_classes = [] 
-    def post(self, request, format=None):
-        serializer = SnippetSerializer(data=request.data)
+        snippets = user.userprofile.snippets.all()
+
+        # user.snippets.remove(id=1)
+        if snippet in snippets:
+            user.userprofile.snippets.remove(snippet)
+            return Response(status = 200)
+        else :
+            user.userprofile.snippets.add(snippet)
+            return Response(status = 200)
+
+
+class FavoriteList(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+
+        token = self.request.data.get('token')
+        payload = jwt.decode(token, "SECRET", algorithm='HS256')
+        user_id = payload['user_id']
+        user = User.objects.get(id=user_id)
+
+        snippets = user.userprofile.snippets.all()
+        snippets = Snippet.objects.all()[:10]
+
+        serializer = SnippetSerializer(snippets, many=True, data=request.data)
+        print(serializer.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=200)
+        else: 
+            return Response(serializer.errors, status=400)
+
+
+
+class TestList(generics.ListCreateAPIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
+        snippets = Snippet.objects.all()
+        # snippets = [Category.objects.create(title='%d' % s) for s in range(20)]
+        xs = [s.__dict__ for s in snippets]
+        # print(xs)
+        serializer = SnippetSerializer(snippets, many=True, data={})
+    
+        if serializer.is_valid():
+            return Response(serializer.data, status=200)
+        else: 
+            return Response(serializer.errors, status=400)
+
+
