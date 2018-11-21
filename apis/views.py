@@ -177,7 +177,7 @@ class PreferencesList(APIView):
         payload = jwt.decode(token, "SECRET", algorithm='HS256')
         user_id = payload['user_id']
         user = User.objects.get(id=user_id)
-
+        
         serializer = PreferencesSerializer(instance=user.userprofile)
 
         return Response(serializer.data, status=200)
