@@ -74,7 +74,7 @@ class Snippet(models.Model):
 	publisher = models.ForeignKey(Publisher, blank=True, null=True, on_delete=models.SET_NULL)
 	admin = models.ForeignKey(User,blank=True, null=True, on_delete=models.SET_NULL)
 
-
+	is_ocred = models.BooleanField(default=False)
 	is_tender = models.BooleanField(default=False)
 	is_auction = models.BooleanField(default=False)
 	is_republished = models.BooleanField(default=False)

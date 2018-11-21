@@ -238,8 +238,11 @@ def extract_paper(request, paper_id):
 @login_required(login_url='/dashboard/login/')
 def ocr_paper(request, paper_id):
 	if request.method == 'POST':
+		bw_rate_threshold = 84
 		paper = Newspaper.objects.get(id=paper_id)
-		snippets = paper.snippet_set.all()
+		snippets = paper.snippet_set.filter(bw_rate__gte = bw_rate_threshold,
+											is_ocred = False
+											)
 
 		for s in snippets : 
 			im_path = s.image.path
@@ -250,8 +253,8 @@ def ocr_paper(request, paper_id):
 						
 			try :
 				s.text = OceanOCR.get_image_text(im)
-				if s.text : 
-					s.save()
+				s.is_ocred = True 
+				s.save()
 
 			except Exception as e :
 				print(str(e))

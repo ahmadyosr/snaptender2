@@ -15,6 +15,7 @@ class BoxesExtractor():
 		self.thresh = None 
 		self.buildings = []
 		self.cropped_rectangles = []
+		self.detected_rectangles = []
 		
 		return 
 
