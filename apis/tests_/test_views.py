@@ -224,14 +224,13 @@ class PreferencesTestCase(RegisterAndLoginApiTestCase):
 
 	def test_get_preferences(self):
 		self.test_set_preferences()
+
 		url = reverse('apis:get-preferences')
 		payload = {'token':self.token}
 		r = self.client.post(url,
 							json.dumps(payload),
 							content_type='application/json'
 							)
-		print('R.DATA', r.data)
-
 		self.assertEqual(r.status_code, status.HTTP_200_OK)
 		# self.assertTrue(self.user.userprofile.categories.all().count(), len(categories))
 		# serlf.assertEqual(len, len)
