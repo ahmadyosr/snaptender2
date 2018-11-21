@@ -159,7 +159,6 @@ class AddPreferencesList(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        print('REQUEST DATA', request.data)
         serializer = PreferencesSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -174,6 +173,11 @@ class PreferencesList(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        serializer = PreferencesSerializer(data=request.data)
-        print(serializer.data)
+        token = request.data['token']
+        payload = jwt.decode(token, "SECRET", algorithm='HS256')
+        user_id = payload['user_id']
+        user = User.objects.get(id=user_id)
+
+        serializer = PreferencesSerializer(instance=user.userprofile)
+
         return Response(serializer.data, status=200)

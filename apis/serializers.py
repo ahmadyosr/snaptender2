@@ -9,9 +9,13 @@ from catalogue.serializers import CategorySerializer
 
 
 
-class PreferencesSerializer(serializers.Serializer):
+class PreferencesSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many = True)
     token = serializers.CharField(write_only=True)
+    
+    class Meta : 
+        model = UserProfile
+        fields = ('token','categories',)
 
     def create(self, validated_data):
         token = validated_data['token']
