@@ -12,6 +12,8 @@ urlpatterns = [
 	path('favorites/', views.FavoriteList.as_view(), name='favorites'),
 
 	path('add_preferences/', views.AddPreferencesList.as_view(), name='add-preferences'),
+	path('get_preferences/', views.PreferencesList.as_view(), name='get-preferences'),
+	
 	path('auth/login/', views.LoginApi.as_view(), name='login'),
 	path('auth/register/', views.RegisterApi.as_view(), name='register')
 ]

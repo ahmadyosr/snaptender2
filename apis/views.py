@@ -54,15 +54,15 @@ class LoginApi(APIView):
     
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
 
-        if not username or not password:
+        if not email or not password:
             return Response({'error': 'Invalid Credentials'},
                             status=status.HTTP_400_BAD_REQUEST)
         
-        user = authenticate(username=username, password= password)
+        user = authenticate(email=email, password= password)
 
 
         if not user : 
@@ -85,19 +85,19 @@ class RegisterApi(APIView):
     authentication_classes = [] 
     def post(self, request, *args, **kwargs):
         if not request.data:
-            return Response({'Error': "Please provide username/password/"}, status="400")
+            return Response({'Error': "Please provide email/password/"}, status="400")
 
 
         serializer = RegisterSerializer(data=request.data)
 
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
-        if (not username) or (not password):
+        if (not email) or (not password):
             return Response(status=400)
 
         try:
-            user = User.objects.get(username=username, password=password)
+            user = User.objects.get(email=email)
 
         except User.DoesNotExist:
 
@@ -159,12 +159,21 @@ class AddPreferencesList(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
+        print('REQUEST DATA', request.data)
         serializer = PreferencesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            print(serializer.data)
 
+        if serializer.is_valid():
+            # serializer.save()
+            # print(serializer.data)
+            serializer.save()
+            
         return Response(serializer.data, status=200)
 
 
+class PreferencesList(APIView):
+    permission_classes = (permissions.AllowAny,)
 
+    def post(self, request, *args, **kwargs):
+        serializer = PreferencesSerializer(data=request.data)
+        print(serializer.data)
+        return Response(serializer.data, status=200)

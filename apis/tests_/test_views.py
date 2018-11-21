@@ -11,33 +11,33 @@ class RegisterAndLoginApiTestCase(TestCase):
 	"""
 
 	def setUp(self):
-		self.username = 'ahmad%d' %(random.random()*10000)
+		self.email = 'ahmad%d@gmail.com' %(random.random()*10000)
 		self.password = 'thisispassword1234'
 
 		self.valid_payload = {
-			'username': self.username, 
+			'email': self.email, 
 			'password': self.password,
 		}
 		self.invalid_payload = {
-			'username': '',
+			'email': '',
 			'password':'ahmadyosr'
 		}
 		self.token = None
 		self.user = None
 
-		self.valid_login_payload = {'username':self.username, 
+		self.valid_login_payload = {'email':self.email, 
 									'password':self.password}
 
 	def test_register(self):
 		response = self.client.post(
 			reverse('apis:register'),
-			data=json.dumps(self.valid_payload),
+			data=json.dumps(self.valid_login_payload),
 			content_type='application/json'
 		)
 
 		self.token = response.data.get('token').decode('utf-8')
 
-		self.user = User.objects.get(username= self.username)
+		self.user = User.objects.get(email= self.email)
 
 		self.assertTrue(len(self.token)>1)
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -63,8 +63,8 @@ class RegisterAndLoginApiTestCase(TestCase):
 
 		token = response.data['token']
 
-		# change username to change token
-		self.user.username='ahmadnewusername'
+		# change email to change token
+		self.user.email='ahmadnewusername'
 		self.user.save()
 
 		self.assertFalse(str(self.token) == str(token))
@@ -210,7 +210,7 @@ class PreferencesTestCase(RegisterAndLoginApiTestCase):
 	def test_set_preferences(self):
 		self.test_register()
 		categories = [Category.objects.create(title='title is %d' % i ) for i in range(10)]
-		categories_ids = [{'id': c.id} for c in categories]
+		categories_ids = [{'id': str(c.id), 'title':c.title } for c in categories]
 		url = reverse('apis:add-preferences')
 		self.pref_payload = {'token':self.token , 'categories':categories_ids}
 
@@ -221,3 +221,15 @@ class PreferencesTestCase(RegisterAndLoginApiTestCase):
 		self.assertEqual(r.status_code, status.HTTP_200_OK)
 		self.assertTrue(self.user.userprofile.categories.all().count(), len(categories))
 
+	def set_get_preferences(self):
+		self.test_register()
+		url = reverse('apis:get-preferences')
+		payload = {'token':self.token}
+
+		r = self.client.post(url,
+							json.dumps(payload),
+							content_type='application/json'
+							)
+		self.assertEqual(r.status_code, status.HTTP_200_OK)
+		# self.assertTrue(self.user.userprofile.categories.all().count(), len(categories))
+		# serlf.assertEqual(len, len)

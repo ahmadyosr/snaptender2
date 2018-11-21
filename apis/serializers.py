@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.conf import settings 
 import jwt
 from rest_framework import serializers
-from catalogue.models import Snippet
+from catalogue.models import Snippet, Category
 from catalogue.serializers import CategorySerializer
 
 
@@ -13,13 +13,24 @@ class PreferencesSerializer(serializers.Serializer):
     categories = CategorySerializer(many = True)
     token = serializers.CharField(write_only=True)
 
+    def create(self, validated_data):
+        token = validated_data['token']
+        payload = jwt.decode(token, "SECRET", algorithm='HS256')
+        user_id = payload['user_id']
+        user = User.objects.get(id=user_id)
 
+        for c in validated_data['categories']:
+            category = Category.objects.get(id=c['id'])
+            user.userprofile.categories.add(category)
+
+        return user.userprofile 
+         
 class RegisterSerializer(serializers.ModelSerializer):
     token = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'password', 'token')
+        fields = ('id', 'email', 'password', 'token')
         extra_kwargs = {'password': {'write_only': True}}
 
 
@@ -28,13 +39,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User(
-            username=validated_data['username']
+            email=validated_data['email']
         )
         user.set_password(validated_data['password'])
         user.save()
 
         encoded_token = jwt.encode({'user_id': user.id, 
-                                    'username':user.username }, 'SECRET', algorithm='HS256')
+                                    'email':user.email }, 'SECRET', algorithm='HS256')
         user.userprofile.token = encoded_token
         user.save()
         return user
@@ -42,7 +53,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     token = serializers.SerializerMethodField()
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def get_token(self, obj):
@@ -53,3 +64,4 @@ class LoginSerializer(serializers.Serializer):
         instance.userprofile.token = new_token
         instance.save()
         return instance
+
