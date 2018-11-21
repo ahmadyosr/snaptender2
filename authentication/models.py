@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from catalogue.models import Snippet, Category
 from django.core.exceptions import ObjectDoesNotExist
-
+import random 
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	token = models.TextField(max_length=500, blank=True)
@@ -24,3 +24,9 @@ def save_user_profile(sender, instance, **kwargs):
 	    instance.userprofile.save()
 	except ObjectDoesNotExist : 
 		pass 
+
+
+@receiver(pre_save, sender=User)
+def is_user_created(sender, instance, **kwargs):
+    if not(instance.username):
+    	instance.username = 'user%d' % (random.random()*1000000)
